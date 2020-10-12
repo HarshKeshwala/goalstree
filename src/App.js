@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import firebase from './firestore';
 
+const App = () => {
+
+const [goals, setGoals] = useState([]);
+
+const getData = () => {
+    firebase.db.collection('Goals').get()
+      .then(querySnapshot => {
+        console.log(querySnapshot);
+        const data = [];
+        querySnapshot.forEach((doc) => {
+          data.push(doc.data());
+        });
+        setGoals(data);
+    })
+    .catch(err => {
+      console.log(err.message)
+    })
+  }
+  // console.log(firebase.db)
+   console.log(goals);
+  return(
+      <div className="App">
+        <h1>Goals Tree</h1>
+
+        <button onClick={getData}>Get Data</button>
+        {
+          goals.map((goal) => (
+            <div key={goal.goalId}>
+              <p>{goal.name}</p>
+              <p>{goal.status}</p>
+            </div>
+          ))
+        }
+      </div>
+  )
+}
 export default App;
